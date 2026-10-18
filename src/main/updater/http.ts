@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { fetchBuffer, fetchJson } from "@main/utils/http";
+import { fetchJson } from "@main/utils/http";
 import { VENCORD_USER_AGENT } from "@shared/vencordUserAgent";
-import { writeFileSync } from "original-fs";
 
 import gitHash from "~git-hash";
 import gitRemote from "~git-remote";
@@ -61,6 +60,8 @@ async function fetchUpdate() {
         return false;
 
     const asset = data.assets.find(a => a.name === ASAR_FILE);
+    if (!asset) return false;
+
     PendingUpdate = asset.browser_download_url;
 
     return true;
@@ -69,12 +70,11 @@ async function fetchUpdate() {
 async function applyUpdate() {
     if (!PendingUpdate) return true;
 
-    const data = await fetchBuffer(PendingUpdate);
-    writeFileSync(__dirname, data, { flush: true });
-
-    PendingUpdate = null;
-
-    return true;
+    // __dirname is always a directory. Injected installs load loose files from
+    // a dist/ folder, so there is no single file to overwrite with the asar.
+    // Bail out with a clear message instead of crashing with EISDIR.
+    // (There is no local source repo either, so the git updater can't help.)
+    throw new Error("In-app update is not supported for this install type. Please update using the installer.");
 }
 
 const HttpUpdater: Updater = {
