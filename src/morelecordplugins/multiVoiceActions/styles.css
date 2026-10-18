@@ -24,7 +24,7 @@
     background: var(--background-modifier-hover);
 }
 
-.vc-mva-selected {
+[data-vc-mva-user].vc-mva-selected {
     background: var(--background-modifier-selected);
     border-radius: 4px;
     box-shadow: inset 2px 0 0 var(--brand-experiment);

@@ -7,7 +7,6 @@
 import "./styles.css";
 
 import type { NavContextMenuPatchCallback } from "@api/ContextMenu";
-import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 import type { Channel, User } from "@vencord/discord-types";
 import {
@@ -32,13 +31,14 @@ import { settings } from "./settings";
 
 const ID_RE = /\b(\d{17,20})\b/;
 
-function resolveVoiceTargetFromEvent(e: MouseEvent): { guildId: string; channelId: string; userId: string; } | null {
+function resolveVoiceTargetFromEvent(e: MouseEvent | DragEvent): { guildId: string; channelId: string; userId: string; rowEl: HTMLElement | null; } | null {
     const el = e.target as HTMLElement | null;
     if (!el || !(el instanceof HTMLElement)) return null;
 
     // 1) Explicit data attributes set by Discord on some rows.
     const dataEl = el.closest?.("[data-vc-mva-user],[data-user-id],[data-author-id],[data-list-item-id]") as HTMLElement | null;
     let userId: string | null = dataEl?.dataset?.vcMvaUser ?? dataEl?.dataset?.userId ?? dataEl?.dataset?.authorId ?? null;
+    let sourceEl: HTMLElement | null = dataEl;
     const listItemId = dataEl?.dataset?.listItemId;
     if (!userId && listItemId) {
         const m = ID_RE.exec(listItemId);
@@ -50,7 +50,10 @@ function resolveVoiceTargetFromEvent(e: MouseEvent): { guildId: string; channelI
         const link = el.closest?.('a[href*="/users/"]') as HTMLAnchorElement | null;
         const href = link?.href ?? link?.getAttribute?.("href") ?? "";
         const m = /\/users\/(\d{17,20})/.exec(href);
-        if (m) userId = m[1];
+        if (m) {
+            userId = m[1];
+            sourceEl = link;
+        }
     }
 
     if (!userId) return null;
@@ -68,11 +71,41 @@ function resolveVoiceTargetFromEvent(e: MouseEvent): { guildId: string; channelI
         ?? null;
     if (!guildId) return null;
 
-    return { guildId, channelId: voiceState.channelId, userId };
+    const rowEl = closestRow(sourceEl) ?? sourceEl;
+    return { guildId, channelId: voiceState.channelId, userId, rowEl };
+}
+
+function closestRow(source: HTMLElement | null): HTMLElement | null {
+    if (!source) return null;
+    for (let node: HTMLElement | null = source, i = 0; node && i < 5; node = node.parentElement, i++) {
+        if (node.hasAttribute("data-dnd-name")) return node;
+    }
+    return source;
+}
+
+function highlightUser(userId: string) {
+    const anchors = new Set<HTMLElement>();
+    const collect = (nodes: Element | NodeListOf<Element> | null) => {
+        const arr = !nodes ? [] : nodes instanceof Element ? [nodes] : Array.from(nodes);
+        for (const el of arr) if (el instanceof HTMLElement) anchors.add(el);
+    };
+    const id = CSS.escape(userId);
+    collect(document.querySelector(`[data-vc-mva-user="${id}"]`));
+    collect(document.querySelectorAll(`[data-user-id="${id}"]`));
+    collect(document.querySelectorAll(`[data-author-id="${id}"]`));
+    collect(document.querySelectorAll(`a[href*="/users/${userId}"]`));
+    for (const anchor of anchors) {
+        const row = closestRow(anchor) ?? anchor;
+        row.setAttribute("data-vc-mva-user", userId);
+        row.classList.add("vc-mva-selected");
+    }
 }
 
 function applyHighlights() {
     const enabled = settings.store.highlightSelection;
+    if (enabled) {
+        for (const userId of getSelection().userIds) highlightUser(userId);
+    }
     for (const row of document.querySelectorAll<HTMLElement>("[data-vc-mva-user]")) {
         const id = row.getAttribute("data-vc-mva-user");
         row.classList.toggle("vc-mva-selected", enabled && !!id && isSelected(id));
@@ -105,6 +138,12 @@ function onCtrlClick(e: MouseEvent) {
     e.stopPropagation();
 
     const added = toggleSelect(target.guildId, target.channelId, target.userId);
+    if (target.rowEl) {
+        target.rowEl.setAttribute("data-vc-mva-user", target.userId);
+        if (settings.store.highlightSelection) target.rowEl.classList.toggle("vc-mva-selected", added);
+        else target.rowEl.classList.remove("vc-mva-selected");
+    }
+    applyHighlights();
     const user = UserStore.getUser(target.userId) as User | undefined;
     const name = user?.globalName ?? user?.username ?? target.userId;
     showToast(added ? `Added ${name} to voice selection (${getSelectionSize()})` : `Removed ${name} from voice selection (${getSelectionSize()})`);
@@ -419,7 +458,9 @@ export default definePlugin({
     name: "MultiVoiceActions",
     description: "Ctrl+Click voice users to multi-select, then move/disconnect/mute/deafen them at once. Also via user & voice-channel right-click menus.",
     tags: ["Voice", "Servers", "Utility"],
-    authors: [Devs.Ven],
+    authors: [
+        { name: "Morodirule", id: 717912700491005973n },
+    ],
     settings,
 
     patches: [
