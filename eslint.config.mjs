@@ -15,11 +15,11 @@ import tseslint from "typescript-eslint";
 export default defineConfig(
     { ignores: ["dist", "browser", "packages/vencord-types", "misc/bundle", "misc/scripts",
         // Third-party plugins vendored as git submodules; styled by their own upstreams
-        "src/equicordplugins/bringBackKaomojiPicker/**",
-        "src/equicordplugins/showPing/**",
-        "src/equicordplugins/betterForwardMeta/**",
-        "src/equicordplugins/voiceUserButtons/**",
-        "src/equicordplugins/MediaStatus/**"] },
+        "src/morelecordplugins/bringBackKaomojiPicker/**",
+        "src/morelecordplugins/showPing/**",
+        "src/morelecordplugins/betterForwardMeta/**",
+        "src/morelecordplugins/voiceUserButtons/**",
+        "src/morelecordplugins/MediaStatus/**"] },
     {
         files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}", "eslint.config.mjs"],
         settings: {

@@ -27,6 +27,7 @@
         "generatePluginJson": "tsx scripts/generatePluginList.ts",
         "generateEquicordPluginJson": "tsx scripts/generatePluginList.ts --equicord",
         "generateVencordPluginJson": "tsx scripts/generatePluginList.ts --vencord",
+        "generateMorelecordPluginJson": "tsx scripts/generatePluginList.ts --morelecord",
         "generateTypes": "tspc --emitDeclarationOnly --declaration --outDir packages/vencord-types --allowJs false",
         "inject": "node scripts/runInstaller.mjs -- --install",
         "uninject": "node scripts/runInstaller.mjs -- --uninstall",

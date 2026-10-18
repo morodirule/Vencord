@@ -1,15 +1,15 @@
-[submodule "src/equicordplugins/bringBackKaomojiPicker"]
-	path = src/equicordplugins/bringBackKaomojiPicker
+[submodule "src/morelecordplugins/bringBackKaomojiPicker"]
+	path = src/morelecordplugins/bringBackKaomojiPicker
 	url = https://github.com/Blankiiii/bringBackKaomojiPicker.git
-[submodule "src/equicordplugins/showPing"]
-	path = src/equicordplugins/showPing
+[submodule "src/morelecordplugins/showPing"]
+	path = src/morelecordplugins/showPing
 	url = https://github.com/nicola02nb/showPing.git
-[submodule "src/equicordplugins/betterForwardMeta"]
-	path = src/equicordplugins/betterForwardMeta
+[submodule "src/morelecordplugins/betterForwardMeta"]
+	path = src/morelecordplugins/betterForwardMeta
 	url = https://git.nin0.dev/userplugins/betterForwardMeta.git
-[submodule "src/equicordplugins/voiceUserButtons"]
-	path = src/equicordplugins/voiceUserButtons
+[submodule "src/morelecordplugins/voiceUserButtons"]
+	path = src/morelecordplugins/voiceUserButtons
 	url = https://github.com/nicola02nb/voiceUserButtons.git
-[submodule "src/equicordplugins/MediaStatus"]
-	path = src/equicordplugins/MediaStatus
+[submodule "src/morelecordplugins/MediaStatus"]
+	path = src/morelecordplugins/MediaStatus
 	url = https://github.com/redbaron2k7/MediaStatus.git

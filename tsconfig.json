@@ -61,6 +61,9 @@
             ],
             "@equicordplugins/*": [
                 "./src/equicordplugins/*"
+            ],
+            "@morelecordplugins/*": [
+                "./src/morelecordplugins/*"
             ]
         },
         "plugins": [
@@ -82,10 +85,10 @@
     // their upstreams' API versions, so excluded from typechecking.
     // esbuild still bundles them; see scripts/build/common.mjs globPlugins.
     "exclude": [
-        "src/equicordplugins/bringBackKaomojiPicker/**/*",
-        "src/equicordplugins/showPing/**/*",
-        "src/equicordplugins/betterForwardMeta/**/*",
-        "src/equicordplugins/voiceUserButtons/**/*",
-        "src/equicordplugins/MediaStatus/**/*"
+        "src/morelecordplugins/bringBackKaomojiPicker/**/*",
+        "src/morelecordplugins/showPing/**/*",
+        "src/morelecordplugins/betterForwardMeta/**/*",
+        "src/morelecordplugins/voiceUserButtons/**/*",
+        "src/morelecordplugins/MediaStatus/**/*"
     ],
 }

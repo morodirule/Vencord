@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { readdirSync, writeFileSync } from "fs";
+import { existsSync, readdirSync, writeFileSync } from "fs";
 import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, PluginData } from "./utils";
 
 (async () => {
@@ -27,6 +27,7 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
 
     const equicordFlag = args.includes("--equicord");
     const vencordFlag = args.includes("--vencord");
+    const morelecordFlag = args.includes("--morelecord");
 
     let dirs: string[];
 
@@ -34,8 +35,10 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
         dirs = ["src/equicordplugins/_core", "src/equicordplugins"];
     } else if (vencordFlag) {
         dirs = ["src/plugins", "src/plugins/_core"];
+    } else if (morelecordFlag) {
+        dirs = ["src/morelecordplugins/_core", "src/morelecordplugins"];
     } else {
-        dirs = ["src/plugins", "src/plugins/_core", "src/equicordplugins/_core", "src/equicordplugins"];
+        dirs = ["src/plugins", "src/plugins/_core", "src/equicordplugins/_core", "src/equicordplugins", "src/morelecordplugins/_core", "src/morelecordplugins"];
     }
 
     const outputPath = args.find(a => !a.startsWith("--")) ?? null;
@@ -43,7 +46,7 @@ import { getEntryPoint, isPluginFile, parseDevs, parseEquicordDevs, parseFile, P
     const plugins = [] as PluginData[];
 
     await Promise.all(
-        dirs.flatMap(dir =>
+        dirs.filter(dir => existsSync(dir)).flatMap(dir =>
             readdirSync(dir, { withFileTypes: true })
                 .filter(isPluginFile)
                 .map(async dirent => {
