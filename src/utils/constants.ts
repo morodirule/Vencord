@@ -1465,6 +1465,37 @@ export const EquicordDevs = Object.freeze({
     },
 } satisfies Record<string, Dev>);
 
+export const MoreleCordDevs = Object.freeze({
+    Morodirule: {
+        name: "Morodirule",
+        id: 717912700491005973n
+    },
+    sirphantom89: {
+        name: "SirPhantom89",
+        id: 1464279455844274188n
+    },
+    x2b: {
+        name: "x2b",
+        id: 996137713432530976n
+    },
+    examplegit: {
+        name: "example.user",
+        id: 175411535357673473n
+    },
+    menheraSt: {
+        name: "Menhera.st Team",
+        id: 1325012503419420734n
+    }
+} satisfies Record<string, Dev>);
+
+export const MoreleCordDevsById = /* #__PURE__*/ (() =>
+    Object.freeze(Object.fromEntries(
+        Object.entries(MoreleCordDevs)
+            .filter(d => d[1].id !== 0n)
+            .map(([_, v]) => [v.id, v] as const)
+    ))
+)() as Record<string, Dev>;
+
 // iife so #__PURE__ works correctly
 export const VencordDevsById = /* #__PURE__*/ (() =>
     Object.freeze(Object.fromEntries(
