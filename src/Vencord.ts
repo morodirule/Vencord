@@ -169,7 +169,6 @@ async function runUpdateCheck() {
 
 async function init() {
     await onceReady;
-    console.log("morelecord started :3");
     startAllPlugins(StartAt.WebpackReady);
 
     syncSettings();

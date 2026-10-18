@@ -16,17 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { fetchJson } from "@main/utils/http";
+import { fetchBuffer, fetchJson } from "@main/utils/http";
 import { VENCORD_USER_AGENT } from "@shared/vencordUserAgent";
+import { writeFileSync } from "original-fs";
 
 import gitHash from "~git-hash";
-import gitRemote from "~git-remote";
 
 import { Updater } from ".";
 import { ASAR_FILE } from "./common";
 
-const API_BASE = `https://api.github.com/repos/${gitRemote}`;
+const REPO = "morodirule/Vencord";
+const API_BASE = `https://api.github.com/repos/${REPO}`;
 let PendingUpdate: string | null = null;
+let PendingUpdateHash: string | null = null;
 
 async function githubGet<T = any>(endpoint: string) {
     return fetchJson<T>(API_BASE + endpoint, {
@@ -43,7 +45,13 @@ async function listUpdates() {
     const isOutdated = await fetchUpdate();
     if (!isOutdated) return [];
 
-    const data = await githubGet(`/compare/${gitHash}...HEAD`);
+    let data;
+    try {
+        data = await githubGet(`/compare/${gitHash}...HEAD`);
+    } catch {
+        // local commit is not in the remote history (e.g. rewritten or upstream merges)
+        return [{ hash: PendingUpdateHash ?? "", author: "GitHub", message: "New release available" }];
+    }
 
     return data.commits.map((c: any) => ({
         hash: c.sha,
@@ -60,9 +68,10 @@ async function fetchUpdate() {
         return false;
 
     const asset = data.assets.find(a => a.name === ASAR_FILE);
-    if (!asset) return false;
+    if (!asset) throw new Error(`Latest release is missing ${ASAR_FILE}`);
 
     PendingUpdate = asset.browser_download_url;
+    PendingUpdateHash = hash;
 
     return true;
 }
@@ -70,15 +79,16 @@ async function fetchUpdate() {
 async function applyUpdate() {
     if (!PendingUpdate) return true;
 
-    // __dirname is always a directory. Injected installs load loose files from
-    // a dist/ folder, so there is no single file to overwrite with the asar.
-    // Bail out with a clear message instead of crashing with EISDIR.
-    // (There is no local source repo either, so the git updater can't help.)
-    throw new Error("In-app update is not supported for this install type. Please update using the installer.");
+    const data = await fetchBuffer(PendingUpdate);
+    writeFileSync(__dirname, data, { flush: true });
+
+    PendingUpdate = null;
+
+    return true;
 }
 
 const HttpUpdater: Updater = {
-    getRepo: async () => `https://github.com/${gitRemote}`,
+    getRepo: async () => `https://github.com/${REPO}`,
     listUpdates,
     fetchUpdate,
     applyUpdate

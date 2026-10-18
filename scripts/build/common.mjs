@@ -21,14 +21,13 @@
 import "../suppressExperimentalWarnings.js";
 import "../checkNodeVersion.js";
 
-import { exec, execSync } from "child_process";
+import { execSync } from "child_process";
 import esbuild, { build, context } from "esbuild";
 import { constants as FsConstants, readFileSync } from "fs";
 import { access, readdir, readFile } from "fs/promises";
 import { minify as minifyHtml } from "html-minifier-terser";
 import { dirname, join, relative, resolve } from "path";
 import { fileURLToPath } from "url";
-import { promisify } from "util";
 
 import { getPluginTarget } from "../utils.mjs";
 
@@ -229,18 +228,9 @@ export const gitRemotePlugin = {
         build.onResolve({ filter }, args => ({
             namespace: "git-remote", path: args.path
         }));
-        build.onLoad({ filter, namespace: "git-remote" }, async () => {
-            let remote = process.env.EQUICORD_REMOTE;
-            if (!remote) {
-                const res = await promisify(exec)("git remote get-url origin", { encoding: "utf-8" });
-                remote = res.stdout.trim()
-                    .replace("https://github.com/", "")
-                    .replace("git@github.com:", "")
-                    .replace(/.git$/, "");
-            }
-
-            return { contents: `export default "${remote}"` };
-        });
+        build.onLoad({ filter, namespace: "git-remote" }, () => ({
+            contents: `export default "${process.env.EQUICORD_REMOTE || "morodirule/Vencord"}"`
+        }));
     }
 };
 

@@ -7,8 +7,6 @@
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 
-import gitRemote from "~git-remote";
-
 import { serializeErrors } from "./common";
 
 export type UpdateData = Record<"hash" | "message" | "author", string>;
@@ -22,7 +20,7 @@ export interface Updater {
 
 const updater: Updater = IS_UPDATER_DISABLED
     ? {
-        getRepo: async () => `https://github.com/${gitRemote}`,
+        getRepo: async () => "https://github.com/morodirule/Vencord",
         listUpdates: async () => [],
         fetchUpdate: async () => false,
         applyUpdate: async () => false,
