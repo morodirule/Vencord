@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { RestAPI, showToast } from "@webpack/common";
+import { MediaEngineStore, RestAPI, showToast, SoundboardStore, VoiceActions } from "@webpack/common";
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
@@ -33,6 +33,25 @@ async function runBulk(
     for (const userId of userIds) {
         try {
             await patchMember(guildId, userId, makeBody());
+            ok.push(userId);
+        } catch (error) {
+            failed.push({ userId, error });
+        }
+        if (delayMs > 0) await sleep(delayMs);
+    }
+    return { ok, failed };
+}
+
+async function runEach(
+    userIds: string[],
+    fn: (userId: string) => void,
+    delayMs: number
+): Promise<BulkResult> {
+    const ok: string[] = [];
+    const failed: BulkResult["failed"] = [];
+    for (const userId of userIds) {
+        try {
+            fn(userId);
             ok.push(userId);
         } catch (error) {
             failed.push({ userId, error });
@@ -73,5 +92,31 @@ export async function bulkMute(guildId: string, userIds: string[], muted: boolea
 export async function bulkDeafen(guildId: string, userIds: string[], deafened: boolean, delayMs: number) {
     const result = await runBulk(guildId, userIds, () => ({ deaf: deafened }), delayMs);
     report(deafened ? "Server deafen" : "Server undeafen", result);
+    return result;
+}
+
+export async function bulkLocalMute(userIds: string[], muted: boolean, delayMs: number) {
+    const result = await runEach(userIds, id => {
+        if (MediaEngineStore.isLocalMute(id) !== muted) VoiceActions.toggleLocalMute(id);
+    }, delayMs);
+    report(muted ? "Local mute" : "Local unmute", result);
+    return result;
+}
+
+export async function bulkLocalSoundboardMute(userIds: string[], muted: boolean, delayMs: number) {
+    const result = await runEach(userIds, id => {
+        if (SoundboardStore.isLocalSoundboardMuted(id) !== muted) VoiceActions.toggleLocalSoundboardMute(id);
+    }, delayMs);
+    report(muted ? "Soundboard mute" : "Soundboard unmute", result);
+    return result;
+}
+
+export async function bulkLocalVideo(userIds: string[], disabled: boolean, delayMs: number) {
+    const result = await runEach(userIds, id => {
+        if (MediaEngineStore.isLocalVideoDisabled(id) !== disabled) {
+            VoiceActions.setDisableLocalVideo(id, disabled ? "DISABLED" : "ENABLED", "default");
+        }
+    }, delayMs);
+    report(disabled ? "Disable video" : "Enable video", result);
     return result;
 }

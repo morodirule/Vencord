@@ -18,6 +18,21 @@ export const settings = definePluginSettings({
         description: "Clear selection after a move/disconnect action",
         default: true
     },
+    highlightSelection: {
+        type: OptionType.BOOLEAN,
+        description: "Highlight selected users in the voice channel list",
+        default: true
+    },
+    fanOutContextMenu: {
+        type: OptionType.BOOLEAN,
+        description: "Apply right-click menu actions (mute, move, disconnect, …) to every selected user",
+        default: true
+    },
+    multiDrag: {
+        type: OptionType.BOOLEAN,
+        description: "Dragging a selected user moves the whole selection",
+        default: true
+    },
     actionDelayMs: {
         type: OptionType.SLIDER,
         description: "Delay between individual member updates (ms, avoids rate limits)",

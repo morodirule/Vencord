@@ -467,6 +467,73 @@ function isValidHttpsUrl(url: string): boolean {
     }
 }
 
+export async function uploadToCopyparty(
+    _: IpcMainInvokeEvent,
+    fileBuffer: ArrayBuffer,
+    filename: string,
+    uploadUrl: string,
+    password?: string
+): Promise<NativeUploadResult> {
+    if (!isValidHttpsUrl(uploadUrl)) {
+        return { success: false, error: "Invalid or non-HTTPS upload URL" };
+    }
+
+    try {
+        const base = uploadUrl.replace(/\/+$/, "");
+        const formData = new FormData();
+        formData.append("f", new Blob([fileBuffer]), filename);
+
+        const headers: Record<string, string> = {};
+        if (password?.trim()) {
+            headers.PW = password.trim();
+        }
+
+        const response = await fetch(`${base}/?j`, {
+            method: "POST",
+            headers,
+            body: formData
+        });
+
+        const text = (await response.text()).trim();
+        if (!response.ok) {
+            return { success: false, error: `Upload failed: ${response.status} ${text}` };
+        }
+
+        let data: unknown = null;
+        try {
+            data = text ? JSON.parse(text) : null;
+        } catch {
+            data = null;
+        }
+
+        const rawUrl = extractCopypartyUrl(data) || (/^(https?:)?\//.test(text) ? text : "");
+        if (!rawUrl) {
+            return { success: false, error: "No URL returned from upload" };
+        }
+
+        return { success: true, url: absolutizeCopypartyUrl(rawUrl, base) };
+    } catch (e) {
+        return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
+    }
+}
+
+function extractCopypartyUrl(data: unknown): string {
+    if (!data) return "";
+    if (typeof data === "string") return data;
+    if (Array.isArray(data)) return extractCopypartyUrl(data[0]);
+    if (typeof data === "object" && "url" in data && typeof data.url === "string") return data.url;
+    return "";
+}
+
+function absolutizeCopypartyUrl(url: string, base: string): string {
+    if (/^https?:\/\//i.test(url)) return url;
+    try {
+        return new URL(url, base).href;
+    } catch {
+        return url;
+    }
+}
+
 export async function uploadToWebdav(
     _: IpcMainInvokeEvent,
     fileBuffer: ArrayBuffer,

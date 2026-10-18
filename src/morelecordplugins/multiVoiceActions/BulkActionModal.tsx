@@ -35,7 +35,7 @@ interface Props {
     sourceChannelId: string;
 }
 
-function getVoiceDestinationChannels(guildId: string, excludeChannelId: string): Channel[] {
+export function getVoiceDestinationChannels(guildId: string, excludeChannelId: string): Channel[] {
     try {
         const groups = GuildChannelStore.getChannels(guildId);
         const vocal = (groups?.VOCAL ?? []).map(e => (e as { channel: Channel; }).channel ?? e as unknown as Channel);

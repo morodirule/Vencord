@@ -596,6 +596,8 @@ export function isConfigured(): boolean {
             return Boolean((settings.store as { pixelVaultKey?: string; }).pixelVaultKey);
         case ServiceType.WEBDAV:
             return Boolean((settings.store as { webdavUrl?: string; }).webdavUrl);
+        case ServiceType.COPYPARTY:
+            return Boolean((settings.store as { copypartyUrl?: string; }).copypartyUrl);
         case ServiceType.SHAREX:
             try {
                 parseShareXConfigFromSettings();
@@ -1128,6 +1130,80 @@ async function uploadToWebdav(fileBlob: Blob, filename: string): Promise<string>
     return await createWebdavShare(relativePath, serverOrigin, filename);
 }
 
+function extractCopypartyUrl(data: unknown): string {
+    if (!data) return "";
+    if (typeof data === "string") return data;
+    if (Array.isArray(data)) return extractCopypartyUrl(data[0]);
+    if (typeof data === "object" && "url" in data && typeof data.url === "string") return data.url;
+    return "";
+}
+
+function absolutizeCopypartyUrl(url: string, base: string): string {
+    if (/^https?:\/\//i.test(url)) return url;
+    try {
+        return new URL(url, base).href;
+    } catch {
+        return url;
+    }
+}
+
+async function uploadToCopyparty(fileBlob: Blob, filename: string): Promise<string> {
+    const { copypartyUrl, copypartyPassword } = settings.store as {
+        copypartyUrl?: string;
+        copypartyPassword?: string;
+    };
+
+    if (!copypartyUrl?.trim()) {
+        throw new Error("copyparty upload URL is required");
+    }
+
+    const base = copypartyUrl.trim().replace(/\/+$/, "");
+
+    if (Native) {
+        const result = await Native.uploadToCopyparty(
+            await fileBlob.arrayBuffer(),
+            filename,
+            base,
+            copypartyPassword?.trim() || undefined
+        );
+        if (!result.success || !result.url) throw new Error(result.error || "No URL returned from upload");
+        return result.url;
+    }
+
+    const formData = new FormData();
+    formData.append("f", fileBlob, filename);
+
+    const headers: Record<string, string> = {};
+    if (copypartyPassword?.trim()) {
+        headers.PW = copypartyPassword.trim();
+    }
+
+    const response = await uploadRequestWithTimeout(`${base}/?j`, {
+        method: "POST",
+        headers,
+        body: formData
+    });
+
+    const text = (await response.text()).trim();
+    if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${text}`);
+    }
+
+    let data: unknown = null;
+    try {
+        data = text ? JSON.parse(text) : null;
+    } catch {
+        data = null;
+    }
+
+    const rawUrl = extractCopypartyUrl(data) || (/^(https?:)?\//.test(text) ? text : "");
+    if (!rawUrl) {
+        throw new Error("No URL returned from upload");
+    }
+
+    return absolutizeCopypartyUrl(rawUrl, base);
+}
+
 async function uploadToService(serviceType: ServiceType, fileBlob: Blob, filename: string): Promise<string> {
     switch (serviceType) {
         case ServiceType.ZIPLINE:
@@ -1164,6 +1240,8 @@ async function uploadToService(serviceType: ServiceType, fileBlob: Blob, filenam
             return uploadToPixelDrain(fileBlob, filename);
         case ServiceType.WEBDAV:
             return uploadToWebdav(fileBlob, filename);
+        case ServiceType.COPYPARTY:
+            return uploadToCopyparty(fileBlob, filename);
         default:
             throw new Error("Unknown service type");
     }

@@ -37,7 +37,8 @@ const serviceOptions = [
     { label: "PixelVault", value: ServiceType.PIXELVAULT },
     { label: "PixelDrain", value: ServiceType.PIXELDRAIN },
     { label: "ShareX Custom Uploader", value: ServiceType.SHAREX },
-    { label: "WebDAV (Nextcloud/Owncloud)", value: ServiceType.WEBDAV }
+    { label: "WebDAV (Nextcloud/Owncloud)", value: ServiceType.WEBDAV },
+    { label: "copyparty", value: ServiceType.COPYPARTY }
 ];
 
 const litterboxOptions = [
@@ -364,6 +365,18 @@ export const settings = definePluginSettings({
             { label: "Markdown Link", value: "markdown" }
         ],
         default: "share-page",
+        hidden: true
+    },
+    copypartyUrl: {
+        type: OptionType.STRING,
+        description: "copyparty upload URL",
+        default: "",
+        hidden: true
+    },
+    copypartyPassword: {
+        type: OptionType.STRING,
+        description: "copyparty password",
+        default: "",
         hidden: true
     },
     uploadAllowedFileTypes: {
@@ -897,6 +910,25 @@ export function SettingsComponent() {
                             />
                         </SettingsSection>
                     )}
+                </SettingGroup>
+            )}
+
+            {serviceType === ServiceType.COPYPARTY && (
+                <SettingGroup name="copyparty" description="Connection details for copyparty uploads.">
+                    <SettingTextInput
+                        name="Upload URL"
+                        description="Full copyparty upload URL, for example https://files.example.com/upl/"
+                        value={settings.store.copypartyUrl}
+                        onChange={v => settings.store.copypartyUrl = v}
+                        placeholder="https://files.example.com/upl/"
+                    />
+                    <SettingTextInput
+                        name="Password"
+                        description="copyparty password or upload token. Leave empty for public upload folders."
+                        value={settings.store.copypartyPassword}
+                        onChange={v => settings.store.copypartyPassword = v}
+                        placeholder="Optional password"
+                    />
                 </SettingGroup>
             )}
 
