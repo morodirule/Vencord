@@ -7,7 +7,7 @@ on:
 env:
     FORCE_COLOR: true
     GITHUB_TOKEN: ${{ secrets.ETOKEN }}
-    REPO: Equicord/Equibored
+    REPO: morodirule/Vencord
     USERNAME: GitHub-Actions
 
 permissions:
@@ -69,8 +69,8 @@ jobs:
               run: |
                   gh release upload latest --clobber dist/release/*
 
-            - name: Upload Plugin JSONs to Equibored repo
-              if: github.repository == 'Equicord/Equicord' && vars.ACT == 'false'
+            - name: Upload Plugin JSONs to morodirule/Vencord repo
+              if: github.repository == 'morodirule/Vencord' && vars.ACT == 'false'
               run: |
                   git config --global user.name "GitHub-Actions"
                   git config --global user.email actions@github.com
@@ -81,5 +81,5 @@ jobs:
                   cp ../dist/release/devs.json .
                   git add -A
 
-                  git commit -m "Plugins for https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+                  git commit -m "Plugins for https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA [skip ci]"
                   git push --force https://$USERNAME:$GITHUB_TOKEN@github.com/$REPO.git
