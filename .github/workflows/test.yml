@@ -16,6 +16,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v7
+              with:
+                  submodules: recursive
 
             - name: Setup PNPM
               uses: pnpm/setup@v2.1.0

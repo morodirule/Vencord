@@ -78,4 +78,14 @@
         "scripts/**/*",
         "eslint.config.mjs"
     ],
+    // Third-party plugins vendored as git submodules; written against
+    // their upstreams' API versions, so excluded from typechecking.
+    // esbuild still bundles them; see scripts/build/common.mjs globPlugins.
+    "exclude": [
+        "src/equicordplugins/bringBackKaomojiPicker/**/*",
+        "src/equicordplugins/showPing/**/*",
+        "src/equicordplugins/betterForwardMeta/**/*",
+        "src/equicordplugins/voiceUserButtons/**/*",
+        "src/equicordplugins/MediaStatus/**/*"
+    ],
 }

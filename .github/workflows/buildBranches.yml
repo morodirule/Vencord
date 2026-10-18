@@ -33,12 +33,13 @@ jobs:
     Build:
         name: Build Equicord
         runs-on: ubuntu-latest
-        if: github.repository == 'Equicord/Equicord'
+        if: github.repository == 'Equicord/Equicord' || github.repository == 'morodirule/Vencord'
 
         steps:
             - uses: actions/checkout@v6
               with:
                   ref: ${{ github.event.inputs.branch || github.ref }}
+                  submodules: recursive
 
             - name: Setup PNPM
               if: github.ref_name != 'bun'

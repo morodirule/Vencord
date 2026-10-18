@@ -20,7 +20,7 @@ import { Dirent, readdirSync, readFileSync, writeFileSync } from "fs";
 import { access, readFile } from "fs/promises";
 import { join, sep } from "path";
 import { normalize as posixNormalize, sep as posixSep } from "path/posix";
-import { BigIntLiteral, createSourceFile, Identifier, isArrayLiteralExpression, isCallExpression, isExportAssignment, isIdentifier, isObjectLiteralExpression, isPropertyAccessExpression, isPropertyAssignment, isSatisfiesExpression, isStringLiteral, isVariableStatement, NamedDeclaration, NodeArray, ObjectLiteralExpression, PropertyAssignment, ScriptTarget, StringLiteral, SyntaxKind } from "typescript";
+import { BigIntLiteral, createSourceFile, Identifier, isArrayLiteralExpression, isBigIntLiteral, isCallExpression, isExportAssignment, isIdentifier, isNumericLiteral, isObjectLiteralExpression, isPropertyAccessExpression, isPropertyAssignment, isSatisfiesExpression, isStringLiteral, isVariableStatement, NamedDeclaration, NodeArray, ObjectLiteralExpression, PropertyAssignment, ScriptTarget, StringLiteral, SyntaxKind } from "typescript";
 
 import { getPluginTarget } from "./utils.mjs";
 import { PluginTarget, PluginTargets } from "@utils/pluginTargets";
@@ -204,10 +204,22 @@ export async function parseFile(fileName: string) {
                 case "authors":
                     if (!isArrayLiteralExpression(value)) throw fail("authors is not an array literal");
                     data.authors = value.elements.map(e => {
-                        if (!isPropertyAccessExpression(e)) throw fail("authors array contains non-property access expressions");
-                        const d = devs[getName(e)!] || equicordDevs[getName(e)!];
-                        if (!d) throw fail(`couldn't look up author ${getName(e)}`);
-                        return d;
+                        if (isPropertyAccessExpression(e)) {
+                            const d = devs[getName(e)!] || equicordDevs[getName(e)!];
+                            if (!d) throw fail(`couldn't look up author ${getName(e)}`);
+                            return d;
+                        }
+                        // Third-party/submodule plugins declare authors inline
+                        // instead of via Devs: authors: [{ name: "Foo", id: 123n }]
+                        if (isObjectLiteralExpression(e)) {
+                            const nameProp = getObjectProp(e, "name");
+                            const idProp = getObjectProp(e, "id");
+                            if (nameProp && isStringLiteral(nameProp) && idProp && (isBigIntLiteral(idProp) || isNumericLiteral(idProp) || isStringLiteral(idProp))) {
+                                const id = isBigIntLiteral(idProp) ? idProp.text.slice(0, -1) : idProp.text;
+                                return { name: nameProp.text, id };
+                            }
+                        }
+                        throw fail("authors array contains non-property access expressions");
                     });
                     break;
                 case "tags":

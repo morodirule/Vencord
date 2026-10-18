@@ -13,7 +13,13 @@ import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
 
 export default defineConfig(
-    { ignores: ["dist", "browser", "packages/vencord-types", "misc/bundle", "misc/scripts"] },
+    { ignores: ["dist", "browser", "packages/vencord-types", "misc/bundle", "misc/scripts",
+        // Third-party plugins vendored as git submodules; styled by their own upstreams
+        "src/equicordplugins/bringBackKaomojiPicker/**",
+        "src/equicordplugins/showPing/**",
+        "src/equicordplugins/betterForwardMeta/**",
+        "src/equicordplugins/voiceUserButtons/**",
+        "src/equicordplugins/MediaStatus/**"] },
     {
         files: ["src/**/*.{tsx,ts,mts,mjs,js,jsx}", "eslint.config.mjs"],
         settings: {

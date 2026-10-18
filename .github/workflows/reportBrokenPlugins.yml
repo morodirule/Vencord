@@ -42,6 +42,7 @@ jobs:
               with:
                   repository: ${{ inputs.pr_repo || github.repository }}
                   ref: ${{ inputs.ref || (github.event_name == 'schedule' && 'dev' || github.ref) }}
+                  submodules: recursive
 
             - name: Setup PNPM
               uses: pnpm/setup@v2.1.0
