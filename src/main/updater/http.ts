@@ -19,15 +19,35 @@
 import { fetchBuffer, fetchJson } from "@main/utils/http";
 import { VENCORD_USER_AGENT } from "@shared/vencordUserAgent";
 import { writeFileSync } from "original-fs";
+import { join } from "path";
 
 import gitHash from "~git-hash";
 
 import { Updater } from ".";
-import { ASAR_FILE } from "./common";
 
 const REPO = "morodirule/Vencord";
 const API_BASE = `https://api.github.com/repos/${REPO}`;
-let PendingUpdate: string | null = null;
+
+// Release asset name -> local file name in __dirname.
+// Discord Desktop injects loose files from dist/ (patcher.js etc).
+// Equibop standalone runs from dist/equibop/ (main.js etc) but the
+// release publishes them prefixed (equibopMain.js -> main.js).
+// See .github/workflows/build.yml "Collect files to be released".
+const FILES_TO_UPDATE: Array<[assetName: string, localName: string]> = IS_DISCORD_DESKTOP
+    ? [
+        ["patcher.js", "patcher.js"],
+        ["preload.js", "preload.js"],
+        ["renderer.js", "renderer.js"],
+        ["renderer.css", "renderer.css"]
+    ]
+    : [
+        ["equibopMain.js", "main.js"],
+        ["equibopPreload.js", "preload.js"],
+        ["equibopRenderer.js", "renderer.js"],
+        ["equibopRenderer.css", "renderer.css"]
+    ];
+
+let PendingUpdates: Array<{ asset: string; local: string; url: string }> = [];
 let PendingUpdateHash: string | null = null;
 
 async function githubGet<T = any>(endpoint: string) {
@@ -67,22 +87,32 @@ async function fetchUpdate() {
     if (hash === gitHash)
         return false;
 
-    const asset = data.assets.find(a => a.name === ASAR_FILE);
-    if (!asset) throw new Error(`Latest release is missing ${ASAR_FILE}`);
+    const assetsByName = new Map<string, string>((data.assets ?? []).map((a: any) => [a.name, a.browser_download_url]));
 
-    PendingUpdate = asset.browser_download_url;
+    const missing = FILES_TO_UPDATE.filter(([asset]) => !assetsByName.has(asset)).map(([asset]) => asset);
+    if (missing.length) throw new Error(`Latest release is missing ${missing.join(", ")}`);
+
+    PendingUpdates = FILES_TO_UPDATE.map(([asset, local]) => ({ asset, local, url: assetsByName.get(asset)! }));
     PendingUpdateHash = hash;
 
     return true;
 }
 
 async function applyUpdate() {
-    if (!PendingUpdate) return true;
+    if (!PendingUpdates.length) return true;
 
-    const data = await fetchBuffer(PendingUpdate);
-    writeFileSync(__dirname, data, { flush: true });
+    // Download everything first so a failed download doesn't leave a half-updated install
+    const files = await Promise.all(
+        PendingUpdates.map(async ({ local, url }) => ({ local, data: await fetchBuffer(url) }))
+    );
 
-    PendingUpdate = null;
+    for (const { local, data } of files) {
+        // join with __dirname (a directory). Never pass __dirname itself to
+        // writeFileSync or Node throws EISDIR.
+        writeFileSync(join(__dirname, local), data, { flush: true });
+    }
+
+    PendingUpdates = [];
 
     return true;
 }
