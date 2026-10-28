@@ -1132,9 +1132,21 @@ async function uploadToWebdav(fileBlob: Blob, filename: string): Promise<string>
 
 function extractCopypartyUrl(data: unknown): string {
     if (!data) return "";
-    if (typeof data === "string") return data;
-    if (Array.isArray(data)) return extractCopypartyUrl(data[0]);
-    if (typeof data === "object" && "url" in data && typeof data.url === "string") return data.url;
+    if (typeof data === "string") return data.trim();
+    if (Array.isArray(data)) {
+        for (const item of data) {
+            const url = extractCopypartyUrl(item);
+            if (url) return url;
+        }
+        return "";
+    }
+    if (typeof data === "object") {
+        const obj = data as Record<string, unknown>;
+        // PUT ?j returns {"fileurl": ...}; mPOST ?j returns {"files": [{"url": ...}], "fileurl": ...}
+        if (typeof obj.url === "string" && obj.url.trim()) return obj.url.trim();
+        if (typeof obj.fileurl === "string" && obj.fileurl.trim()) return obj.fileurl.trim();
+        if (Array.isArray(obj.files)) return extractCopypartyUrl(obj.files);
+    }
     return "";
 }
 
