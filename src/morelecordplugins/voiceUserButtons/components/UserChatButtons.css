@@ -1,0 +1,7 @@
+.voice-user-buttons {
+    gap: 1px !important;
+}
+
+.voice-user-button-container > button {
+    padding: 1px;
+}

@@ -46,7 +46,7 @@
         "outDir": "who-fucking-cares-dude"
     },
     "include": ["src/**/*", "browser/**/*", "scripts/**/*"],
-    // Third-party plugins vendored as git submodules; written against
+    // Third-party plugins vendored into the tree; written against
     // their upstreams' API versions, so excluded from typechecking.
     // esbuild still bundles them; see scripts/build/common.mjs globPlugins.
     "exclude": [
