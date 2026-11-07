@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Text } from "@components/Text";
 import { copyWithToast } from "@utils/discord";
 import { Guild } from "@vencord/discord-types";
-import { React, RestAPI, Text, useEffect, useState } from "@webpack/common";
+import { React, RestAPI, useEffect, useState } from "@webpack/common";
 
 import { FormSection } from "../FormSection";
 import { logger } from "../index";
@@ -41,19 +42,19 @@ export function WebhooksTab({ guild }: { guild: Guild; }) {
     return (
         <div className="gt-webhooks">
             <FormSection title="Webhooks">
-                {state === "loading" && <Text variant="text-sm/normal">Loading…</Text>}
+                {state === "loading" && <Text size="sm">Loading…</Text>}
                 {state === "denied" && (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-muted)" }}>
+                    <Text size="sm" style={{ color: "var(--text-muted)" }}>
                         You don't have Manage Webhooks permission in this server.
                     </Text>
                 )}
                 {state === "error" && (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-danger)" }}>
+                    <Text size="sm" style={{ color: "var(--text-danger)" }}>
                         Failed: {err}
                     </Text>
                 )}
                 {state === "done" && hooks.length === 0 && (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-muted)" }}>No webhooks.</Text>
+                    <Text size="sm" style={{ color: "var(--text-muted)" }}>No webhooks.</Text>
                 )}
                 {state === "done" && hooks.length > 0 && (
                     <div className="gt-webhook-list">

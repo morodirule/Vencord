@@ -23,7 +23,8 @@
     --gt-accent: var(--brand-experiment, #5865f2);
     --gt-good: var(--status-positive, #23a559);
     --gt-bad: var(--status-danger, #f23f43);
-    --gt-mono: ui-monospace, sfmono-regular, "SF Mono", menlo, consolas, "Liberation Mono", monospace;
+    --gt-mono:
+        ui-monospace, sfmono-regular, "SF Mono", menlo, consolas, "Liberation Mono", monospace;
     --gt-text-normal: var(--text-default, var(--text-normal, #dbdee1));
     --gt-text-muted: var(--text-muted, #949ba4);
 
@@ -42,9 +43,11 @@
     gap: var(--gt-gap);
     padding: var(--gt-pad);
     border-bottom: 1px solid var(--gt-border);
-    background: linear-gradient(180deg,
-            color-mix(in srgb, var(--gt-accent) 8%, transparent),
-            transparent);
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--gt-accent) 8%, transparent),
+        transparent
+    );
 }
 
 .guild-toolkit-header-content {
@@ -674,7 +677,7 @@
     background-color: var(--background-tertiary) !important;
     border: 1px solid var(--gt-border) !important;
     color: var(--text-muted) !important;
-    opacity: 0.70 !important;
+    opacity: 0.7 !important;
 }
 
 .gt-target-toggle .gt-mode-btn:not(.gt-selected) * {
@@ -876,7 +879,10 @@
     max-height: 1000px;
     opacity: 1;
     overflow: hidden;
-    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, padding 0.3s ease;
+    transition:
+        max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease,
+        padding 0.3s ease;
 }
 
 .gt-collapsible-content.gt-collapsed {
@@ -968,7 +974,9 @@ button[class*="closeButton"] {
     justify-content: center;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
 }
 
 button[class*="closeButton"]:hover {
@@ -992,4 +1000,3 @@ button[class*="closeButton"]:active {
 .gt-section-title {
     margin-bottom: 4px;
 }
-

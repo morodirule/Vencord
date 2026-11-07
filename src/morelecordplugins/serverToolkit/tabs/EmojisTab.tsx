@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Text } from "@components/Text";
 import { copyWithToast } from "@utils/discord";
 import { Guild } from "@vencord/discord-types";
-import { EmojiStore, React, Text, useMemo } from "@webpack/common";
+import { EmojiStore, React, useMemo } from "@webpack/common";
 
 import { FormSection } from "../FormSection";
 
@@ -47,7 +48,7 @@ export function EmojisTab({ guild }: { guild: Guild; }) {
 
             <FormSection title={`Stickers (${stickers.length})`}>
                 {stickers.length === 0 ? (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-muted)" }}>No stickers</Text>
+                    <Text size="sm" style={{ color: "var(--text-muted)" }}>No stickers</Text>
                 ) : (
                     <div className="gt-sticker-grid">
                         {stickers.map((s: any) => (

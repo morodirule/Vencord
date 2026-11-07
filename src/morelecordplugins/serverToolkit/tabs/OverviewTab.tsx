@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Text } from "@components/Text";
 import { copyWithToast } from "@utils/discord";
 import { Guild } from "@vencord/discord-types";
-import { ChannelStore, React, SnowflakeUtils, Text, UserStore } from "@webpack/common";
+import { ChannelStore, React, SnowflakeUtils, UserStore } from "@webpack/common";
 
 import { FormSection } from "../FormSection";
 
@@ -115,7 +116,7 @@ export function OverviewTab({ guild }: { guild: Guild; }) {
 
             <FormSection title={`Features (${features.length})`}>
                 {features.length === 0 ? (
-                    <Text variant="text-sm/normal" style={{ color: "var(--text-muted)" }}>No features</Text>
+                    <Text size="sm" style={{ color: "var(--text-muted)" }}>No features</Text>
                 ) : (
                     <div className="gt-feature-grid">
                         {features.map(f => (

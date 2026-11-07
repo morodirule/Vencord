@@ -146,7 +146,7 @@ function onCtrlClick(e: MouseEvent) {
     applyHighlights();
     const user = UserStore.getUser(target.userId) as User | undefined;
     const name = user?.globalName ?? user?.username ?? target.userId;
-    showToast(added ? `Added ${name} to voice selection (${getSelectionSize()})` : `Removed ${name} from voice selection (${getSelectionSize()})`);
+    showToast({ text: added ? `Added ${name} to voice selection (${getSelectionSize()})` : `Removed ${name} from voice selection (${getSelectionSize()})` });
 }
 
 let pendingMultiDrag: { guildId: string; sourceChannelId: string; userIds: string[]; draggedUserId: string; } | null = null;
@@ -436,9 +436,9 @@ const channelContextPatch: NavContextMenuPatchCallback = (children, props: Chann
                     try {
                         const ids = Object.keys(VoiceStateStore.getVoiceStatesForChannel(channel.id) ?? {});
                         addMany(guildId, channel.id, ids);
-                        showToast(`Selected ${ids.length} user(s). Ctrl+Click toggles individuals.`);
+                        showToast({ text: `Selected ${ids.length} user(s). Ctrl+Click toggles individuals.` });
                     } catch {
-                        showToast("Could not read voice states", "failure");
+                        showToast({ text: "Could not read voice states", variant: "critical" });
                     }
                 }}
             />
@@ -494,7 +494,7 @@ export default definePlugin({
                 openBulkActionModal(sel.guildId, sel.channelId);
                 return;
             }
-            showToast("Ctrl+Click voice users (or right-click a voice channel) to start a selection");
+            showToast({ text: "Ctrl+Click voice users (or right-click a voice channel) to start a selection" });
         },
         "Clear voice multi-select": () => clearSelection()
     },

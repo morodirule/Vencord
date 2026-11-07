@@ -1,0 +1,7 @@
+# Bot-generated plugin/dev lists (minified JSON written by CI).
+# They are build artifacts committed for the updater, not source files.
+devs.json
+equicordplugins.json
+morelecordplugins.json
+plugins.json
+vencordplugins.json

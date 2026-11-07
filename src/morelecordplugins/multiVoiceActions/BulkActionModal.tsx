@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
+import { Heading } from "@components/Heading";
+import { Text } from "@components/Text";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import type { Channel, RenderModalProps } from "@vencord/discord-types";
 import {
-    Button,
     ChannelStore,
-    Forms,
     GuildChannelStore,
     GuildMemberStore,
     Modal,
@@ -18,7 +19,6 @@ import {
     PermissionsBits,
     PermissionStore,
     SearchableSelect,
-    Text,
     useMemo,
     UserStore,
     useState,
@@ -121,9 +121,9 @@ export default function BulkActionModal({ modalProps, guildId, sourceChannelId }
             ]}
         >
             <div className="vc-mva-section">
-                <Forms.FormTitle tag="h3">Users in this voice channel (Ctrl+Click also works in Discord)</Forms.FormTitle>
+                <Heading tag="h3">Users in this voice channel (Ctrl+Click also works in Discord)</Heading>
                 <div className={classes("vc-mva-userlist", Margins.bottom16)}>
-                    {liveUserIds.length === 0 && <Text variant="text-sm/normal">Nobody is in this voice channel right now.</Text>}
+                    {liveUserIds.length === 0 && <Text size="sm">Nobody is in this voice channel right now.</Text>}
                     {liveUserIds.map(id => (
                         <label key={id} className="vc-mva-row">
                             <input
@@ -136,13 +136,13 @@ export default function BulkActionModal({ modalProps, guildId, sourceChannelId }
                     ))}
                 </div>
                 <div className="vc-mva-row-actions">
-                    <Button size={Button.Sizes.SMALL} color={Button.Colors.PRIMARY} look={Button.Looks.LINK} onClick={() => setChecked(new Set(liveUserIds))} disabled={liveUserIds.length === 0}>Select all</Button>
-                    <Button size={Button.Sizes.SMALL} color={Button.Colors.PRIMARY} look={Button.Looks.LINK} onClick={() => setChecked(new Set())} disabled={checked.size === 0}>Clear</Button>
+                    <Button size="small" variant="link" onClick={() => setChecked(new Set(liveUserIds))} disabled={liveUserIds.length === 0}>Select all</Button>
+                    <Button size="small" variant="link" onClick={() => setChecked(new Set())} disabled={checked.size === 0}>Clear</Button>
                 </div>
             </div>
 
             <div className="vc-mva-section">
-                <Forms.FormTitle tag="h3">Destination voice channel (for Move)</Forms.FormTitle>
+                <Heading tag="h3">Destination voice channel (for Move)</Heading>
                 <SearchableSelect
                     options={destOptions}
                     value={destChannelId ?? undefined}
@@ -151,7 +151,7 @@ export default function BulkActionModal({ modalProps, guildId, sourceChannelId }
                     closeOnSelect
                     onChange={v => setDestChannelId(v as string)}
                 />
-                {!canMove && <Text variant="text-sm/normal" color="text-feedback-warning">You need the Move Members permission to move/disconnect users.</Text>}
+                {!canMove && <Text size="sm" color="text-feedback-warning">You need the Move Members permission to move/disconnect users.</Text>}
             </div>
 
             <div className="vc-mva-actions">
@@ -160,7 +160,7 @@ export default function BulkActionModal({ modalProps, guildId, sourceChannelId }
                     onClick={() => run("Moving…", () => bulkMove(guildId, ids, destChannelId!, delay))}
                 >{busy === "Moving…" ? busy : `Move ${ids.length}`}</Button>
                 <Button
-                    color={Button.Colors.RED}
+                    variant="dangerPrimary"
                     disabled={ids.length === 0 || busy != null}
                     onClick={() => {
                         if (settings.store.confirmBeforeDisconnect && !confirm(`Disconnect ${ids.length} user(s) from voice?`)) return;
@@ -168,22 +168,18 @@ export default function BulkActionModal({ modalProps, guildId, sourceChannelId }
                     }}
                 >{busy === "Disconnecting…" ? busy : `Disconnect ${ids.length}`}</Button>
                 <Button
-                    color={Button.Colors.PRIMARY}
                     disabled={ids.length === 0 || busy != null}
                     onClick={() => run("Muting…", () => bulkMute(guildId, ids, true, delay), { keepSelection: true })}
                 >Mute</Button>
                 <Button
-                    color={Button.Colors.PRIMARY}
                     disabled={ids.length === 0 || busy != null}
                     onClick={() => run("Unmuting…", () => bulkMute(guildId, ids, false, delay), { keepSelection: true })}
                 >Unmute</Button>
                 <Button
-                    color={Button.Colors.PRIMARY}
                     disabled={ids.length === 0 || busy != null}
                     onClick={() => run("Deafening…", () => bulkDeafen(guildId, ids, true, delay), { keepSelection: true })}
                 >Deafen</Button>
                 <Button
-                    color={Button.Colors.PRIMARY}
                     disabled={ids.length === 0 || busy != null}
                     onClick={() => run("Undeafening…", () => bulkDeafen(guildId, ids, false, delay), { keepSelection: true })}
                 >Undeafen</Button>

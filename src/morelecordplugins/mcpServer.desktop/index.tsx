@@ -5,12 +5,14 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { Button } from "@components/Button";
+import { Heading } from "@components/Heading";
+import { Text } from "@components/Text";
 import { EquicordDevs } from "@utils/constants";
 import { copyWithToast } from "@utils/discord";
 import { Logger } from "@utils/Logger";
 import { sleep } from "@utils/misc";
 import definePlugin, { OptionType, PluginNative } from "@utils/types";
-import { Button, Forms } from "@webpack/common";
 
 import { executeTool, TOOLS } from "./tools";
 
@@ -117,16 +119,16 @@ function McpServerInfo() {
 
     return (
         <>
-            <Forms.FormTitle tag="h3">Connection</Forms.FormTitle>
-            <Forms.FormText>
+            <Heading tag="h3">Connection</Heading>
+            <Text size="sm">
                 Point any MCP client at {url}. The server only listens on this computer and answers plain JSON RPC over HTTP.
-            </Forms.FormText>
+            </Text>
             <Button onClick={() => { void copyWithToast(config, "MCP config copied."); }}>
                 Copy MCP Config
             </Button>
-            <Forms.FormText>
+            <Text size="sm">
                 Set an auth token below when other people can reach your network. Changing the port restarts the server on its own.
-            </Forms.FormText>
+            </Text>
         </>
     );
 }

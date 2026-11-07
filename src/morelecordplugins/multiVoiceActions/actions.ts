@@ -63,11 +63,11 @@ async function runEach(
 
 function report(action: string, result: BulkResult) {
     if (result.failed.length === 0) {
-        showToast(`${action}: ${result.ok.length} user(s) updated`, "success");
+        showToast({ text: `${action}: ${result.ok.length} user(s) updated`, variant: "success" });
     } else if (result.ok.length === 0) {
-        showToast(`${action} failed for ${result.failed.length} user(s). Check permissions/role hierarchy.`, "failure");
+        showToast({ text: `${action} failed for ${result.failed.length} user(s). Check permissions/role hierarchy.`, variant: "critical" });
     } else {
-        showToast(`${action}: ${result.ok.length} ok, ${result.failed.length} failed`);
+        showToast({ text: `${action}: ${result.ok.length} ok, ${result.failed.length} failed` });
     }
 }
 

@@ -4,17 +4,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Button } from "@components/Button";
 import { FormSwitch } from "@components/FormSwitch";
+import { Text } from "@components/Text";
 import { openModal } from "@utils/modal";
 import { ModalProps } from "@vencord/discord-types";
 import {
-    Button,
-    Forms,
     GuildStore,
     Modal,
     React,
     Select,
-    Text,
     TextInput,
     useEffect,
     useMemo,
@@ -159,16 +158,16 @@ function CopyModal({ modalProps, guild }: { modalProps: ModalProps; guild: AnyGu
                 <FormSection title="Target">
                     <div className="gt-target-toggle">
                         <Button
-                            size={Button.Sizes.SMALL}
-                            color={targetMode === "new" ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                            size="small"
+                            variant={targetMode === "new" ? "primary" : "secondary"}
                             className={targetMode === "new" ? "gt-mode-btn gt-selected" : "gt-mode-btn"}
                             onClick={() => setTargetMode("new")}
                         >
                             Create new server
                         </Button>
                         <Button
-                            size={Button.Sizes.SMALL}
-                            color={targetMode === "existing" ? Button.Colors.BRAND : Button.Colors.PRIMARY}
+                            size="small"
+                            variant={targetMode === "existing" ? "primary" : "secondary"}
                             className={targetMode === "existing" ? "gt-mode-btn gt-selected" : "gt-mode-btn"}
                             onClick={() => setTargetMode("existing")}
                             disabled={ownedGuilds.length === 0}
@@ -218,7 +217,7 @@ function CopyModal({ modalProps, guild }: { modalProps: ModalProps; guild: AnyGu
 
                 {targetMode === "existing" && (
                     <FormSection title="Wipe target before copying">
-                        <Text style={{ color: "var(--text-danger)", marginBottom: 8 }}>
+                        <Text size="sm" color="text-danger" style={{ marginBottom: 8 }}>
                             Destructive. Deleted items cannot be recovered.
                         </Text>
                         <FormSwitch value={wipeRoles} onChange={setWipeRoles} title="Wipe roles" description="Delete all non-managed roles below your highest role" />
@@ -228,7 +227,7 @@ function CopyModal({ modalProps, guild }: { modalProps: ModalProps; guild: AnyGu
 
                         {anyWipe && (
                             <>
-                                <Forms.FormText>Type <strong>OVERWRITE</strong> to confirm:</Forms.FormText>
+                                <Text size="sm">Type <strong>OVERWRITE</strong> to confirm:</Text>
                                 <TextInput
                                     placeholder="OVERWRITE"
                                     value={confirmText}
@@ -254,15 +253,13 @@ function CopyModal({ modalProps, guild }: { modalProps: ModalProps; guild: AnyGu
             <div>
                 <div style={{ display: "flex", gap: "12px", marginLeft: "auto" }}>
                     <Button
-                        color={Button.Colors.PRIMARY}
-                        look={Button.Looks.LINK}
+                        variant="link"
                         onClick={closeModal}
                         disabled={running}
                     >
                         {running ? "Running…" : "Close"}
                     </Button>
                     <Button
-                        color={Button.Colors.BRAND}
                         onClick={handleRun}
                         disabled={!canRun}
                     >

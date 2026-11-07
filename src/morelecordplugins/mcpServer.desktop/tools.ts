@@ -130,13 +130,6 @@ function optInt(args: Record<string, unknown>, key: string, fallback: number, mi
     return Math.min(max, Math.max(min, v));
 }
 
-function optBool(args: Record<string, unknown>, key: string, fallback: boolean): boolean {
-    const v = args[key];
-    if (v === undefined || v === null) return fallback;
-    if (typeof v !== "boolean") throw new Error(`Argument ${key} must be true or false.`);
-    return v;
-}
-
 function requireUserActions(opts: ToolOptions) {
     if (!opts.allowUserActions) throw new Error("User actions are disabled. Enable them in plugin settings to use this tool.");
 }
@@ -578,7 +571,9 @@ async function getMessages(args: Record<string, unknown>) {
             url: Constants.Endpoints.MESSAGES(channelId),
             query,
         });
-        const messages = listOf(res).slice(0, limit).map(serializeMessage);
+        // RestAPI resolves to a response object, the message list lives in its body
+        const payload = Array.isArray(res) ? res : field(res, "body");
+        const messages = listOf(payload).slice(0, limit).map(serializeMessage);
         return { channel_id: channelId, count: messages.length, source: "api", messages };
     } catch {
         const cached: unknown = MessageStore.getMessages(channelId);
@@ -696,8 +691,8 @@ async function setDraft(args: Record<string, unknown>) {
 async function showToastTool(args: Record<string, unknown>) {
     const message = reqString(args, "message").slice(0, 500);
     const kind = args.type;
-    const type = kind === "success" || kind === "failure" ? kind : "message";
-    showToast(message, type);
+    const variant = kind === "success" ? "success" : kind === "failure" ? "critical" : "default";
+    showToast({ text: message, variant });
     return { shown: true };
 }
 

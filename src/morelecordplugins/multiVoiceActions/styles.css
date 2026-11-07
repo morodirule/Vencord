@@ -27,7 +27,9 @@
 [data-vc-mva-user].vc-mva-selected {
     background: color-mix(in srgb, var(--brand-500) 30%, transparent);
     border-radius: 6px;
-    box-shadow: inset 3px 0 0 var(--brand-500), 0 0 0 1px color-mix(in srgb, var(--brand-500) 70%, transparent);
+    box-shadow:
+        inset 3px 0 0 var(--brand-500),
+        0 0 0 1px color-mix(in srgb, var(--brand-500) 70%, transparent);
 }
 
 .vc-mva-row-actions {

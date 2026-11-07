@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { Heading } from "@components/Heading";
+import { Text } from "@components/Text";
 import { copyWithToast } from "@utils/discord";
 import { Guild } from "@vencord/discord-types";
-import { Forms, GuildMemberCountStore, GuildMemberStore, React, Text, TextInput, useMemo, UserStore, useState } from "@webpack/common";
+import { GuildMemberCountStore, GuildMemberStore, React, TextInput, useMemo, UserStore, useState } from "@webpack/common";
 
 export function MembersTab({ guild }: { guild: Guild; }) {
     const [filter, setFilter] = useState("");
@@ -36,10 +38,10 @@ export function MembersTab({ guild }: { guild: Guild; }) {
 
     return (
         <div className="gt-members">
-            <Forms.FormTitle tag="h2" style={{ marginBottom: 12 }}>
+            <Heading tag="h2" style={{ marginBottom: 12 }}>
                 {`Members (${members.length} cached, ${totalMembers} total)`}
-            </Forms.FormTitle>
-            <Text variant="text-xs/normal" style={{ color: "var(--text-muted)", marginBottom: 8 }}>
+            </Heading>
+            <Text size="xs" style={{ color: "var(--text-muted)", marginBottom: 8 }}>
                 Only members currently loaded by your client are shown. Scroll the member list in Discord to load more.
             </Text>
             <TextInput
