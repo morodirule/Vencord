@@ -411,7 +411,7 @@ export default definePlugin({
     name: "FileUpload",
     description: "Upload files to hosting services like Zipline, Nest, S3, WebDAV, and copyparty",
     tags: ["Media"],
-    authors: [EquicordDevs.creations, EquicordDevs.keircn, Devs.ScattrdBlade],
+    authors: [Devs.creations, EquicordDevs.keircn, Devs.ScattrdBlade],
     settings,
     patches: [
         {
